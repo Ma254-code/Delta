@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>24h Text Anzeige</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .box {
+      background: white;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 600px;
+      text-align: center;
+    }
+    .expired {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Text für 24 Stunden</h2>
+    <div id="textContainer"></div>
+    <div id="status"></div>
+  </div>
+
+  <script>
+    // === Hier trägst du deinen Text ein ===
+    const text = "Dies ist mein geheimer Text, der nach 24 Stunden verschwindet.";
+
+    // === 24 Stunden in Millisekunden ===
+    const EXPIRATION_TIME = 24 * 60 * 60 * 1000;
+
+    // === Speichern des Texts mit Zeitstempel ===
+    function saveText() {
+      const timestamp = Date.now();
+      localStorage.setItem("savedText", text);
+      localStorage.setItem("timestamp", timestamp);
+    }
+
+    // === Laden des Texts ===
+    function loadText() {
+      const savedText = localStorage.getItem("savedText");
+      const savedTime = localStorage.getItem("timestamp");
+
+      if (savedText && savedTime) {
+        const now = Date.now();
+        const age = now - parseInt(savedTime);
+
+        if (age < EXPIRATION_TIME) {
+          document.getElementById("textContainer").textContent = savedText;
+          const remaining = Math.floor((EXPIRATION_TIME - age) / (1000 * 60 * 60));
+          document.getElementById("status").textContent = `Noch gültig für ca. ${remaining} Stunden.`;
+        } else {
+          localStorage.removeItem("savedText");
+          localStorage.removeItem("timestamp");
+          document.getElementById("textContainer").innerHTML = "<span class='expired'>Dieser Text ist abgelaufen.</span>";
+        }
+      } else {
+        saveText();
+        document.getElementById("textContainer").textContent = text;
+        document.getElementById("status").textContent = "Gerade gespeichert – gültig für 24 Stunden.";
+      }
+    }
+
+    loadText();
+  </script>
+</body>
+</html>
